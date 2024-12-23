@@ -1,7 +1,9 @@
 <script>
 import inputTextRaw from '@/inputs/1.txt?raw'
+import DeepCopyMethod from '@/mixins/DeepCopyMethod.vue';
 
 export default {
+  mixins: [DeepCopyMethod],
   data() {
     return {}
   },
@@ -39,6 +41,13 @@ export default {
         output = output + distance
       }
       return output
+    },
+    similarityScore: function () {
+      const scores = []
+      for (const item of this.sortedList1) {
+        scores.push(item * this.deepCopy(this.sortedList2).filter(i => i === item).length)
+      }
+      return scores.reduce((partialSum, a) => partialSum + a, 0)
     }
   }
 };
@@ -46,5 +55,6 @@ export default {
 
 <template>
   <h1>Day 1</h1>
-  <h2>Total Distance: {{ totalDistance }}</h2>
+  <h2>Part 1 - Total Distance: {{ totalDistance }}</h2>
+  <h2>Part 2 - Similarity Score: {{ similarityScore }}</h2>
 </template>
