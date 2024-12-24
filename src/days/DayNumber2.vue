@@ -17,9 +17,32 @@ export default {
     numberOfSafeReports: function () {
       let safeReports = 0
       for (const report of this.processedInput) {
+        if (this.isReportSafe(report)) {
+          safeReports++
+        }
+      }
+      return safeReports
+    },
+    numberOfSafeReportsAllowingSingleRemovedItemToCheckForSuccess: function () {
+      let safeReports = 0
+      for (const report of this.processedInput) {
         const isSafe = this.isReportSafe(report)
-        console.log(report, isSafe)
-        if (isSafe) {
+        if (isSafe === null) {
+          safeReports++
+          continue
+        }
+
+        let anyPass = false
+        for (const variation of this.returnArrayInEveryIterationRemovingSingleItem(report)) {
+          if (anyPass) {
+            continue
+          }
+          if (this.isReportSafe(variation)) {
+            anyPass = true
+            break
+          }
+        }
+        if (anyPass) {
           safeReports++
         }
       }
@@ -27,11 +50,35 @@ export default {
     }
   },
   methods: {
+    returnArrayInEveryIterationRemovingSingleItem(inputArr) {
+      const output = []
+      let index = 0
+      while (index <= inputArr.length) {
+        const temp = []
+        let workingIndex = 0
+        while (workingIndex <= inputArr.length) {
+          if (workingIndex != index) {
+            const tempValue = inputArr[workingIndex]
+            if (tempValue !== undefined) {
+              temp.push(tempValue)
+            }
+          }
+          workingIndex++
+        }
+        if (temp.length < inputArr.length) {
+          output.push(temp)
+        }
+        index++
+      }
+      return output
+    },
     isReportSafe(report) {
       let isAscending = null
       let previousLevel = null
+      let index = -1
 
       for (let currentLevel of report) {
+        index++
         currentLevel = parseInt(currentLevel)
 
         if (previousLevel === null) {
@@ -74,5 +121,6 @@ export default {
 <template>
   <h1>Day 2</h1>
   <h2>Part 1 - Total number of Safe Reports: {{ numberOfSafeReports }}</h2>
-  <h2>Part 2</h2>
+  <h2>Part 2 - Total number of Safe Reports with Problem Dampner: {{
+    numberOfSafeReportsAllowingSingleRemovedItemToCheckForSuccess }}</h2>
 </template>
